@@ -30,14 +30,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isError, setIsError] = useState<string | null>(null);
   const router = useRouter();
 
+  // Helper function to get cookie value
+  const getCookie = (name: string): string | undefined => {
+    if (typeof document === "undefined") return undefined;
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(";").shift();
+  };
+
+  // Load user from cookies on initial render
   useEffect(() => {
-    // Check if user is stored in localStorage
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    const token = getCookie("token");
+    if (token) {
+      // You might want to decode the JWT to get the role here
+      setUser({ token, role: "admin" }); // Adjust role based on your token
     }
     setIsLoading(false);
   }, []);
+
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     setIsError(null);
@@ -60,8 +70,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const userData = await response.json();
+
+      if (!userData.token || !userData.role) {
+        throw new Error("Invalid user data received");
+      }
+
+      // Set cookie with expiration (1 day)
+      const expires = new Date();
+      expires.setDate(expires.getDate() + 1);
+      document.cookie = `token=${
+        userData.token
+      }; path=/; expires=${expires.toUTCString()}; Secure; SameSite=Strict`;
+
       setUser(userData);
-      localStorage.setItem("user", JSON.stringify(userData));
       router.push("/dashboard");
     } catch (error) {
       setIsError(
@@ -71,9 +92,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }
   };
+
   const logout = () => {
+    // Clear cookie
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     setUser(null);
-    localStorage.removeItem("user");
     router.push("/");
   };
 
@@ -83,6 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     </AuthContext.Provider>
   );
 }
+
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {

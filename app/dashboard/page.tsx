@@ -1,58 +1,75 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Overview } from "@/components/overview"
-import { RecentBills } from "@/components/recent-bills"
-import { billsApi } from "@/lib/api"
-import { feedbackApi } from "@/lib/api"
-import { Skeleton } from "@/components/ui/skeleton"
-import { AlertCircle } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import type { Bill } from "@/types/bill"
-import type { Feedback } from "@/types/feedback"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Overview } from "@/components/overview";
+import { RecentBills } from "@/components/recent-bills";
+import { billsApi } from "@/lib/api";
+import { feedbackApi } from "@/lib/api";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import type { Bill } from "@/types/bill";
+import type { Feedback } from "@/types/feedback";
 
 export default function Dashboard() {
-  const [billsCount, setBillsCount] = useState(0)
-  const [totalRevenue, setTotalRevenue] = useState(0)
-  const [feedbackScore, setFeedbackScore] = useState(0)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [billsCount, setBillsCount] = useState(0);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [feedbackScore, setFeedbackScore] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        setLoading(true)
+        setLoading(true);
 
         // Fetch bills data
-        const bills = await billsApi.getAll()
-        setBillsCount(bills.length)
+        const bills = await billsApi.getAll();
+        setBillsCount(bills.length);
 
         // Calculate total revenue
-        const revenue = bills.reduce((total: number, bill: Bill) => total + bill.billAmountData.netPayableAmount, 0)
-        setTotalRevenue(revenue)
+        const revenue = bills.reduce(
+          (total: number, bill: Bill) =>
+            total + bill.billAmountData.netPayableAmount,
+          0
+        );
+        setTotalRevenue(revenue);
 
         // Fetch feedback data and calculate average score
-        const feedback = await feedbackApi.getAll()
+        const feedback = await feedbackApi.getAll();
         if (feedback.length > 0) {
-          const validFeedback = feedback.filter((item) => typeof item.rating === "number")
+          const validFeedback = feedback.filter(
+            (item) => typeof item.rating === "number"
+          );
           if (validFeedback.length > 0) {
             const avgScore =
-              validFeedback.reduce((sum: number, item: Feedback) => sum + (item.rating || 0), 0) / validFeedback.length
-            setFeedbackScore(Number.parseFloat(avgScore.toFixed(1)))
+              validFeedback.reduce(
+                (sum: number, item: Feedback) => sum + (item.rating || 0),
+                0
+              ) / validFeedback.length;
+            setFeedbackScore(Number.parseFloat(avgScore.toFixed(1)));
           } else {
-            setFeedbackScore(0)
+            setFeedbackScore(0);
           }
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch dashboard data")
+        setError(
+          err instanceof Error ? err.message : "Failed to fetch dashboard data"
+        );
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchDashboardData()
-  }, [])
+    fetchDashboardData();
+  }, []);
 
   if (error) {
     return (
@@ -60,7 +77,7 @@ export default function Dashboard() {
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>{error}</AlertDescription>
       </Alert>
-    )
+    );
   }
 
   return (
@@ -77,7 +94,9 @@ export default function Dashboard() {
             ) : (
               <>
                 <div className="text-2xl font-bold">{billsCount}</div>
-                <p className="text-xs text-muted-foreground">All processed bills</p>
+                <p className="text-xs text-muted-foreground">
+                  All processed bills
+                </p>
               </>
             )}
           </CardContent>
@@ -92,16 +111,23 @@ export default function Dashboard() {
             ) : (
               <>
                 <div className="text-2xl font-bold">
-                  ₹{totalRevenue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                  ₹
+                  {totalRevenue.toLocaleString("en-IN", {
+                    maximumFractionDigits: 2,
+                  })}
                 </div>
-                <p className="text-xs text-muted-foreground">From all transactions</p>
+                <p className="text-xs text-muted-foreground">
+                  From all transactions
+                </p>
               </>
             )}
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Feedback Score</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Feedback Score
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
@@ -109,7 +135,9 @@ export default function Dashboard() {
             ) : (
               <>
                 <div className="text-2xl font-bold">{feedbackScore}</div>
-                <p className="text-xs text-muted-foreground">Average customer rating</p>
+                <p className="text-xs text-muted-foreground">
+                  Average customer rating
+                </p>
               </>
             )}
           </CardContent>
@@ -135,5 +163,5 @@ export default function Dashboard() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

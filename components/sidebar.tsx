@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { FileText, Home, MessageSquare, Settings } from "lucide-react"
-import { cn } from "@/lib/utils"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { FileText, Home, MessageSquare, Settings } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const routes = [
   {
@@ -30,10 +30,10 @@ const routes = [
     href: "/dashboard/settings",
     color: "text-green-500",
   },
-]
+];
 
 export function Sidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <div className="space-y-4 py-4 flex flex-col h-full bg-white border-r text-green-950">
@@ -48,7 +48,9 @@ export function Sidebar() {
               href={route.href}
               className={cn(
                 "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-green-700 hover:bg-green-100/50 rounded-lg transition",
-                pathname === route.href ? "text-green-700 bg-green-100" : "text-muted-foreground",
+                pathname === route.href
+                  ? "text-green-700 bg-green-100"
+                  : "text-muted-foreground"
               )}
             >
               <div className="flex items-center flex-1">
@@ -60,5 +62,5 @@ export function Sidebar() {
         </div>
       </div>
     </div>
-  )
+  );
 }

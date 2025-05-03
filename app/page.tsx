@@ -1,4 +1,4 @@
-import LoginForm from "@/components/login-form"
+import LoginForm from "@/components/login-form";
 
 export default function Home() {
   return (
@@ -7,5 +7,5 @@ export default function Home() {
         <LoginForm />
       </div>
     </main>
-  )
+  );
 }
