@@ -1,53 +1,63 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { StarRating } from "@/components/star-rating"
-import { feedbackApi } from "@/lib/api"
-import type { Feedback } from "@/types/feedback"
-import { Skeleton } from "@/components/ui/skeleton"
-import { AlertCircle } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useState, useEffect } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { StarRating } from "@/components/star-rating";
+import { feedbackApi } from "@/lib/api";
+import type { Feedback } from "@/types/feedback";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function FeedbackTable() {
-  const [feedback, setFeedback] = useState<Feedback[]>([])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [feedback, setFeedback] = useState<Feedback[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchFeedback = async () => {
       try {
-        setLoading(true)
-        const data = await feedbackApi.getAll()
-        console.log("Feedback data:", data) // Log the data to see its structure
-        setFeedback(data)
+        setLoading(true);
+        const data = await feedbackApi.getAll();
+        console.log("Feedback data:", data); // Log the data to see its structure
+        setFeedback(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch feedback")
+        setError(
+          err instanceof Error ? err.message : "Failed to fetch feedback"
+        );
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchFeedback()
-  }, [])
+    fetchFeedback();
+  }, []);
 
   // Safely filter feedback with null checks
   const filteredFeedback = feedback.filter((item) => {
-    const customerNameMatch = item.customerName && item.customerName.toLowerCase().includes(searchTerm.toLowerCase())
-    const phoneMatch = item.phone && item.phone.includes(searchTerm)
-    return customerNameMatch || phoneMatch
-  })
-
+    const customerNameMatch =
+      item.customerName &&
+      item.customerName.toLowerCase().includes(searchTerm.toLowerCase());
+    const phoneMatch = item.phone && item.phone.includes(searchTerm);
+    return customerNameMatch || phoneMatch;
+  });
   if (error) {
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>{error}</AlertDescription>
       </Alert>
-    )
+    );
   }
 
   return (
@@ -69,6 +79,7 @@ export function FeedbackTable() {
               <TableHead>Rating</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Comment</TableHead>
+              <TableHead>Bill Id</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -105,17 +116,30 @@ export function FeedbackTable() {
             ) : (
               filteredFeedback.map((item, index) => (
                 <TableRow key={item.id || index}>
-                  <TableCell className="font-medium">{item.customerName || "Unknown"}</TableCell>
+                  <TableCell className="font-medium">
+                    {item.customerName || "Unknown"}
+                  </TableCell>
                   <TableCell>{item.phone || "N/A"}</TableCell>
                   <TableCell>
-                    <StarRating rating={item.rating || 0} />
+                    <StarRating rating={item.stars || 0} />
                   </TableCell>
                   <TableCell>{item.date || "N/A"}</TableCell>
-                  <TableCell className="max-w-xs truncate">{item.comment || "No comment"}</TableCell>
+                  <TableCell className="max-w-xs truncate">
+                    {item.message || "No comment"}
+                  </TableCell>
+                  <TableCell className="max-w-xs truncate">
+                    {item.bill_id || "N/A"}
+                  </TableCell>
                   <TableCell className="text-right">
                     <Button
                       variant="ghost"
-                      onClick={() => window.alert(`View feedback details for ID: ${item.id || "unknown"}`)}
+                      // onClick={() =>
+                      //   window.alert(
+                      //     `View feedback details for ID: ${
+                      //       item.id || "unknown"
+                      //     }`
+                      //   )
+                      // }
                     >
                       View
                     </Button>
@@ -127,5 +151,5 @@ export function FeedbackTable() {
         </Table>
       </div>
     </div>
-  )
+  );
 }
