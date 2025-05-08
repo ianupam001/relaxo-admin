@@ -54,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     try {
       const response = await fetch(
-        "https://relaxobilling.onrender.com/api/auth/login",
+        "http://20.204.134.0/server/api/auth/login",
         {
           method: "POST",
           headers: {

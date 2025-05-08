@@ -1,7 +1,7 @@
 import type { Bill } from "@/types/bill";
 import type { Feedback } from "@/types/feedback";
 
-const BASE_URL = "https://relaxobilling.onrender.com";
+const BASE_URL = "http://20.204.134.0/server";
 
 // Helper function to get cookie value
 const getCookie = (name: string): string | null => {
